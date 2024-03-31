@@ -99,20 +99,23 @@ string FileOrganizer::removeCommentsAndSpaces(const string& code)
 // Tokenize function Processes the given code string and tokenizes it into different categories
 vector<Token> FileOrganizer::tokenize(const string& code)
 {
-	vector<Token> tokens;
-	istringstream codeStream(code);
-	string word;
+	vector<Token> tokens; // Stores the tokens
+	istringstream codeStream(code); // Stream to process each character in the code string
 
+	string word;
+	
+	// Define sets for different token types
 	set<string> keywords = { "int", "return", "using", "namespace", "for" };
-	set<string> multiCharOperators = { "<<", ">>" }; // Added multi-character operators
-	set<char> operators = { '+', '=', '<', '>' };
-	set<char> delimiters = { ';', ',', '(', ')', '{', '}' };
+	set<string> multiCharOperators = { "<<", ">>" }; // Multi-character operators
+	set<char> operators = { '+', '=', '<', '>' }; // Single-character operators
+	set<char> delimiters = { ';', ',', '(', ')', '{', '}' }; // Delimiters
 
 	char currentChar;
 	string currentToken;
 	bool isStringLiteral = false;
 
 	while (codeStream.get(currentChar)) {
+		// Skip spaces unless we are inside a string literal
 		if (isspace(currentChar) && !isStringLiteral) {
 			if (!currentToken.empty()) {
 				classifyToken(currentToken, tokens, keywords, operators, delimiters, multiCharOperators);
@@ -121,12 +124,14 @@ vector<Token> FileOrganizer::tokenize(const string& code)
 			continue;
 		}
 
+		// Handling string literals
 		if (currentChar == '\"') {
 			isStringLiteral = !isStringLiteral;
 			currentToken += currentChar;
 			continue;
 		}
 
+		// Handling non-string literal tokens
 		if (!isStringLiteral) {
 			if (operators.find(currentChar) != operators.end() || delimiters.find(currentChar) != delimiters.end()) {
 				if (!currentToken.empty()) {
